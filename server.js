@@ -42,10 +42,14 @@ app.use(errorHandler);
 // Connect to DB and start server
 const PORT = process.env.PORT || 5000;
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Server Running on port ${PORT}`);
+      console.log(`MONGO_URI: ${process.env.MONGO_URI}`);
     });
   })
   .catch((err) => console.log(err));
