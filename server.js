@@ -19,17 +19,17 @@ const app = express();
 // CORS middleware
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://invt-app.netlify.app"],
+    origin: "https://invt-app.netlify.app",
     credentials: true,
   })
 );
 
-app.use(
-  cors({
-    origin: "*", // Allow all origins
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: "*", // Allow all origins
+//     credentials: true,
+//   })
+// );
 
 // Middleware
 app.use(express.json());
@@ -62,7 +62,7 @@ mongoose
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Server Running on port ${PORT}`);
-      console.log(`MONGO_URI: ${process.env.MONGO_URI}`);
+      // console.log(`MONGO_URI: ${process.env.MONGO_URI}`);
     });
   })
   .catch((err) => console.error(err));
