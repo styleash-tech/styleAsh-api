@@ -10,10 +10,12 @@ const {
   changePassword,
   forgotPassword,
   resetPassword,
+  sendOTP,
 } = require("../controllers/userController");
 const protect = require("../middleWare/authMiddleware");
 
 router.post("/register", registerUser);
+router.post("/send-otp", sendOTP);
 router.post("/login", loginUser);
 router.get("/logout", logout);
 router.get("/getuser", protect, getUser);

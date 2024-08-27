@@ -5,21 +5,97 @@ const bcrypt = require("bcryptjs");
 const Token = require("../models/tokenModel");
 const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
+const otpGenerator = require("otp-generator");
+const OTP = require("../models/OTP");
+const mailSender = require("../utils/mailSender");
 
 // Generate Token
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "90d" });
 };
 
+const sendOTP = async (req, res) => {
+  try {
+    //fetch email from the body of request
+    const { email } = req.body;
+
+    //check if user already exists
+    const checkUserPresent = await User.findOne({ email });
+
+    //if user already exists, then return a response
+    if (checkUserPresent) {
+      return res.status(401).json({
+        success: false,
+        message: "User already registered",
+      });
+    }
+
+    //generate OTP
+    let otp = otpGenerator.generate(6, {
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
+      specialChars: false,
+    });
+    console.log("OTP generated: ", otp);
+
+    //check unique otp or not
+    // const result = await OTP.findOne({ otp: otp });
+
+    // while (result) {
+    //   otp = otpGenerator.generate(6, {
+    //     upperCaseAlphabets: false,
+    //     lowerCaseAlphabets: false,
+    //     specialChars: false,
+    //   });
+    //   result = await OTP.findOne({ otp: otp });
+    // }
+
+    const name = email
+      .split("@")[0]
+      .split(".")
+      .map((part) => part.replace(/\d+/g, ""))
+      .join(" ");
+    console.log(name);
+
+    // send otp in mail
+    await sendEmail(
+      "OTP Verification Email",
+      otp,
+      email,
+      process.env.EMAIL_USER
+    );
+
+    const otpPayload = { email, otp };
+
+    //create an entry for OTP in db
+    const otpBody = await OTP.create(otpPayload);
+    console.log(otpBody);
+
+    //return response successful
+    res.status(200).json({
+      success: true,
+      message: "OTP Sent Successfully",
+      otp,
+    });
+  } catch (error) {
+    console.log("Error while generating Otp - ", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error while generating Otp",
+      error: error.message,
+    });
+  }
+};
 // Register User
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, otp } = req.body;
 
   // Validation
-  if (!name || !email || !password) {
+  if (!name || !email || !password || !otp) {
     res.status(400);
     throw new Error("Please fill in all required fields");
   }
+
   if (password.length < 6) {
     res.status(400);
     throw new Error("Password must be up to 6 characters");
@@ -31,6 +107,38 @@ const registerUser = asyncHandler(async (req, res) => {
   if (userExists) {
     res.status(400);
     throw new Error("Email has already been registered");
+  }
+
+  //find the most recent OTP stored for the user
+  // .sort({ createdAt: -1 }):
+  // It's used to sort the results based on the createdAt field in descending order (-1 means descending).
+  // This way, the most recently created OTP will be returned first.
+  // .limit(1): It limits the number of documents returned to 1.
+  const recentOtp = await OTP.findOne({ email }).sort({ createdAt: -1 });
+
+  if (recentOtp === null) {
+    return res.status(400).json({
+      success: false,
+      message: "Please Provide valid email",
+    });
+  }
+
+  // console.log(recentOtp);
+
+  //validate OTP
+  // console.log("opt is:" + otp);
+  // console.log("recent opt is" + recentOtp.otp);
+  if (!recentOtp) {
+    return res.status(400).json({
+      success: false,
+      message: "OTP not found",
+    });
+  } else if (otp !== recentOtp.otp) {
+    //Invalid OTP
+    return res.status(400).json({
+      success: false,
+      message: "invalid OTP",
+    });
   }
 
   // Create new user
@@ -323,4 +431,5 @@ module.exports = {
   changePassword,
   forgotPassword,
   resetPassword,
+  sendOTP,
 };
