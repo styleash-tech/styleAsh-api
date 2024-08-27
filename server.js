@@ -20,7 +20,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://pinvent-app.vercel.app"],
+    origin: [
+      "http://localhost:3000",
+      "https://charming-taiyaki-9b9c4e.netlify.app",
+    ],
     credentials: true,
   })
 );
