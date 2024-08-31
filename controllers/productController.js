@@ -23,7 +23,7 @@ const createProduct = asyncHandler(async (req, res) => {
   //   throw new Error("Please fill in all fields");
   // }
 
-  if (!name || !quantity || !price) {
+  if (!name) {
     //  || !category  || !color
     res.status(400);
     throw new Error("Please fill in all fields");
