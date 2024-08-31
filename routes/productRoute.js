@@ -14,7 +14,7 @@ const { upload } = require("../utils/fileUpload");
 router.post(
   "/",
   protect,
-  restrict.restrictTo("admin", "sub-admin"),
+  restrict.restrictTo("admin"),
   upload.single("image"),
   createProduct
 );
