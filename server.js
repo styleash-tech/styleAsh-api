@@ -19,7 +19,10 @@ const app = express();
 // CORS middleware
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://invt-app.netlify.app"],
+    origin: [
+      "http://localhost:3000",
+      "https://styleash-invent-app.netlify.app/",
+    ],
     credentials: true,
   })
 );
