@@ -21,7 +21,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://styleash-invent-app.netlify.app/",
+      "https://styleash-invent-app.netlify.app",
     ],
     credentials: true,
   })
