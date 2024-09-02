@@ -7,7 +7,10 @@ const productSchema = mongoose.Schema(
     //   required: true,
     //   ref: "User",
     // },
-    name: {
+    title: {
+      type: String,
+    },
+    sku: {
       type: String,
       required: [true, "Please add a name"],
       trim: true,
@@ -34,7 +37,7 @@ const productSchema = mongoose.Schema(
       trim: true,
     },
     quantity: {
-      type: String,
+      type: Number,
       required: [true, "Please add a quantity"],
       trim: true,
     },

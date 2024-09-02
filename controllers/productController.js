@@ -6,8 +6,8 @@ const cloudinary = require("cloudinary").v2;
 // Create Prouct
 const createProduct = asyncHandler(async (req, res) => {
   const {
-    name,
     sku,
+    title,
     category,
     quantity,
     price,
@@ -23,7 +23,7 @@ const createProduct = asyncHandler(async (req, res) => {
   //   throw new Error("Please fill in all fields");
   // }
 
-  if (!name || !quantity || !price) {
+  if (!sku || !quantity || !price) {
     //  || !category  || !color
     res.status(400);
     throw new Error("Please fill in all fields");
@@ -55,7 +55,7 @@ const createProduct = asyncHandler(async (req, res) => {
   // Create Product
   const product = await Product.create({
     user: req.user.id,
-    name,
+    title,
     sku,
     category,
     color,
@@ -113,7 +113,8 @@ const deleteProduct = asyncHandler(async (req, res) => {
 // Update Product
 const updateProduct = asyncHandler(async (req, res) => {
   const {
-    name,
+    sku,
+    title,
     category,
     quantity,
     price,
@@ -183,7 +184,8 @@ const updateProduct = asyncHandler(async (req, res) => {
   let updateFields = {};
   if (req.user.role === "sub-admin") {
     if (
-      name ||
+      sku ||
+      title ||
       category ||
       price ||
       description ||
@@ -200,7 +202,8 @@ const updateProduct = asyncHandler(async (req, res) => {
   } else if (req.user.role === "admin") {
     // Admin can update all fields
     updateFields = {
-      name,
+      title,
+      sku,
       category,
       quantity,
       price,
