@@ -161,47 +161,10 @@ const updateProduct = asyncHandler(async (req, res) => {
     };
   }
 
-  // // Update Product
-  // const updatedProduct = await Product.findByIdAndUpdate(
-  //   { _id: id },
-  //   {
-  //     name,
-  //     category,
-  //     quantity,
-  //     price,
-  //     description,
-  //     color,
-  //     size,
-  //     location,
-  //     image: Object.keys(fileData).length === 0 ? product?.image : fileData,
-  //   },
-  //   {
-  //     new: true,
-  //     // runValidators: true,
-  //   }
-  // );
-
-  let updateFields = {};
-  if (req.user.role === "sub-admin") {
-    if (
-      sku ||
-      title ||
-      category ||
-      price ||
-      description ||
-      color ||
-      size ||
-      location ||
-      req.file
-    ) {
-      res.status(403);
-      throw new Error("You do not have permission to perform this action.");
-    }
-    // Sub-admin can only update the quantity
-    updateFields = { quantity };
-  } else if (req.user.role === "admin") {
-    // Admin can update all fields
-    updateFields = {
+  // Update Product
+  const updatedProduct = await Product.findByIdAndUpdate(
+    { _id: id },
+    {
       title,
       sku,
       category,
@@ -212,14 +175,52 @@ const updateProduct = asyncHandler(async (req, res) => {
       size,
       location,
       image: Object.keys(fileData).length === 0 ? product?.image : fileData,
-    };
-  }
+    },
+    {
+      new: true,
+      // runValidators: true,
+    }
+  );
 
-  // Update the product
-  const updatedProduct = await Product.findByIdAndUpdate(id, updateFields, {
-    new: true,
-    // runValidators: true,
-  });
+  // let updateFields = {};
+  // if (req.user.role === "sub-admin") {
+  //   if (
+  //     sku ||
+  //     title ||
+  //     category ||
+  //     price ||
+  //     description ||
+  //     color ||
+  //     size ||
+  //     location ||
+  //     req.file
+  //   ) {
+  //     res.status(403);
+  //     throw new Error("You do not have permission to perform this action.");
+  //   }
+  //   // Sub-admin can only update the quantity
+  //   updateFields = { quantity };
+  // } else if (req.user.role === "admin") {
+  //   // Admin can update all fields
+  //   updateFields = {
+  //     title,
+  //     sku,
+  //     category,
+  //     quantity,
+  //     price,
+  //     description,
+  //     color,
+  //     size,
+  //     location,
+  //     image: Object.keys(fileData).length === 0 ? product?.image : fileData,
+  //   };
+  // }
+
+  // // Update the product
+  // const updatedProduct = await Product.findByIdAndUpdate(id, updateFields, {
+  //   new: true,
+  //   // runValidators: true,
+  // });
 
   res.status(200).json(updatedProduct);
 });

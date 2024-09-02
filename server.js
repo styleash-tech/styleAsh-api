@@ -55,13 +55,13 @@ app.get("/", (req, res) => {
 // Error middleware
 app.use(errorHandler);
 
+// Set strictQuery option
+mongoose.set("strictQuery", false); // or true, based on your requirement
+
 // Connect to the database and start the server
 const PORT = process.env.PORT || 5000;
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Server Running on port ${PORT}`);
