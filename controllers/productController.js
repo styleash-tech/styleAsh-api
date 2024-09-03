@@ -1,7 +1,15 @@
 const asyncHandler = require("express-async-handler");
 const Product = require("../models/productModel");
 const { fileSizeFormatter } = require("../utils/fileUpload");
+const fs = require("fs");
+
 const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: "ditfrzog6",
+  api_key: "175674277883678",
+  api_secret: "mMMu_KeI0GV5cxGpH7LS2zFFBKk", // Click 'View API Keys' above to copy your API secret
+});
 
 // Create Prouct
 const createProduct = asyncHandler(async (req, res) => {
@@ -29,28 +37,37 @@ const createProduct = asyncHandler(async (req, res) => {
     throw new Error("Please fill in all fields");
   }
 
-  //Handle Image upload
-  // let fileData = {};
-  // if (req.file) {
-  //   // Save image to cloudinary
-  //   let uploadedFile;
-  //   try {
-  //     uploadedFile = await cloudinary.uploader.upload(req.file.path, {
-  //       folder: "Pinvent App",
-  //       resource_type: "image",
-  //     });
-  //   } catch (error) {
-  //     res.status(500);
-  //     throw new Error("Image could not be uploaded");
-  //   }
+  // Handle Image upload
+  let fileData = {};
+  if (req.file) {
+    // Save image to Cloudinary
+    let uploadedFile;
+    try {
+      uploadedFile = await cloudinary.uploader.upload(req.file.path, {
+        folder: "StyleAsh Inventory",
+        resource_type: "image",
+      });
 
-  //   fileData = {
-  //     fileName: req.file.originalname,
-  //     filePath: uploadedFile.secure_url,
-  //     fileType: req.file.mimetype,
-  //     fileSize: fileSizeFormatter(req.file.size, 2),
-  //   };
-  // }
+      fileData = {
+        fileName: req.file.originalname,
+        filePath: uploadedFile.secure_url,
+        fileType: req.file.mimetype,
+        fileSize: fileSizeFormatter(req.file.size, 2),
+      };
+
+      // Delete the file from the uploads folder
+      fs.unlink(req.file.path, (err) => {
+        if (err) {
+          console.error("Error deleting file:", err);
+        } else {
+          console.log("File deleted successfully from uploads folder");
+        }
+      });
+    } catch (error) {
+      res.status(500);
+      throw new Error("Image could not be uploaded");
+    }
+  }
 
   // Create Product
   const product = await Product.create({
@@ -64,7 +81,7 @@ const createProduct = asyncHandler(async (req, res) => {
     price,
     location,
     description,
-    // image: fileData,
+    image: fileData,
   });
 
   res.status(201).json(product);
