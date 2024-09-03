@@ -158,24 +158,33 @@ const updateProduct = asyncHandler(async (req, res) => {
   // // Handle Image upload
   let fileData = {};
   if (req.file) {
-    // Save image to cloudinary
+    // Save image to Cloudinary
     let uploadedFile;
     try {
       uploadedFile = await cloudinary.uploader.upload(req.file.path, {
-        folder: "Pinvent App",
+        folder: "StyleAsh Inventory",
         resource_type: "image",
+      });
+
+      fileData = {
+        fileName: req.file.originalname,
+        filePath: uploadedFile.secure_url,
+        fileType: req.file.mimetype,
+        fileSize: fileSizeFormatter(req.file.size, 2),
+      };
+
+      // Delete the file from the uploads folder
+      fs.unlink(req.file.path, (err) => {
+        if (err) {
+          console.error("Error deleting file:", err);
+        } else {
+          console.log("File deleted successfully from uploads folder");
+        }
       });
     } catch (error) {
       res.status(500);
       throw new Error("Image could not be uploaded");
     }
-
-    fileData = {
-      fileName: req.file.originalname,
-      filePath: uploadedFile.secure_url,
-      fileType: req.file.mimetype,
-      fileSize: fileSizeFormatter(req.file.size, 2),
-    };
   }
 
   // Update Product
