@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Product = require("../models/productModel");
 const { fileSizeFormatter } = require("../utils/fileUpload");
+const mongoose = require("mongoose"); // For CommonJS
 const fs = require("fs");
 
 const cloudinary = require("cloudinary").v2;
@@ -71,7 +72,7 @@ const createProduct = asyncHandler(async (req, res) => {
 
   // Create Product
   const product = await Product.create({
-    user: req.user.id,
+    // user: req.user.id,
     title,
     sku,
     category,
@@ -111,20 +112,54 @@ const getProduct = asyncHandler(async (req, res) => {
 });
 
 // Delete Product
+// const deleteProduct = asyncHandler(async (req, res) => {
+//   const product = await Product.findById(req.params.id);
+//   const { id } = req.params;
+//   if (!mongoose.Types.ObjectId.isValid(id)) {
+//     return res.status(400).json({ message: "Invalid ID format" });
+//   }
+//   console.log(req.params.id);
+//   console.log(product);
+//   // if product doesnt exist
+//   if (!product) {
+//     res.status(404);
+//     throw new Error("Product not found");
+//   }
+//   // Match product to its user
+//   // if (product.user.toString() !== req.user.id) {
+//   //   res.status(401);
+//   //   throw new Error("User not authorized");
+//   // }
+//   await product.remove();
+//   res.status(200).json({ message: "Product deleted." });
+// });
 const deleteProduct = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
-  // if product doesnt exist
-  if (!product) {
-    res.status(404);
-    throw new Error("Product not found");
+  const { id } = req.params;
+
+  // Check if ID is valid
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid ID format" });
   }
-  // Match product to its user
-  // if (product.user.toString() !== req.user.id) {
-  //   res.status(401);
-  //   throw new Error("User not authorized");
-  // }
-  await product.remove();
-  res.status(200).json({ message: "Product deleted." });
+
+  console.log("Request ID:", id);
+
+  try {
+    // Find and delete the product
+    const result = await Product.findByIdAndDelete(id);
+    console.log("Deletion result:", result);
+
+    // Check if the product exists and was deleted
+    if (!result) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    console.log("Product successfully removed");
+    res.status(200).json({ message: "Product deleted." });
+  } catch (error) {
+    // Log and respond with error
+    console.error("Error during deletion:", error.message || error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 // Update Product
