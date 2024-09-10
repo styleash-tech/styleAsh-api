@@ -10,6 +10,7 @@ const {
   updateProduct,
 } = require("../controllers/productController");
 const { upload } = require("../utils/fileUpload");
+const exportProducts = require("../utils/exportProducts");
 
 router.post(
   "/",
@@ -26,6 +27,7 @@ router.patch(
   updateProduct
 );
 router.get("/", protect, getProducts);
+router.get("/export-products", exportProducts.exportProducts);
 router.get("/:id", protect, getProduct);
 router.delete("/:id", protect, restrict.restrictTo("admin"), deleteProduct);
 
