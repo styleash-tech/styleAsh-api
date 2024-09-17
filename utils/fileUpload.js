@@ -9,7 +9,7 @@ const storage = multer.diskStorage({
     cb(
       null,
       new Date().toISOString().replace(/:/g, "-") + "-" + file.originalname
-    ); // 23/08/2022
+    );
   },
 });
 
@@ -18,7 +18,8 @@ function fileFilter(req, file, cb) {
   if (
     file.mimetype === "image/png" ||
     file.mimetype === "image/jpg" ||
-    file.mimetype === "image/jpeg"
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "text/csv"
   ) {
     cb(null, true);
   } else {

@@ -11,6 +11,7 @@ const {
 } = require("../controllers/productController");
 const { upload } = require("../utils/fileUpload");
 const exportProducts = require("../utils/exportProducts");
+const importFile = require("../utils/importFile");
 
 router.post(
   "/",
@@ -19,6 +20,15 @@ router.post(
   upload.single("image"),
   createProduct
 );
+
+router.post(
+  "/import-products",
+  protect,
+  restrict.restrictTo("admin"),
+  upload.single("file"),
+  importFile.importProducts
+);
+
 router.patch(
   "/:id",
   protect,
@@ -27,14 +37,13 @@ router.patch(
   updateProduct
 );
 router.get("/", protect, getProducts);
-router.get("/export-products", exportProducts.exportProducts);
+router.get(
+  "/export-products",
+  protect,
+  restrict.restrictTo("admin"),
+  exportProducts.exportProducts
+);
 router.get("/:id", protect, getProduct);
 router.delete("/:id", protect, restrict.restrictTo("admin"), deleteProduct);
-
-// router.post("/", upload.single("image"), createProduct);
-// router.patch("/:id", upload.single("image"), updateProduct);
-// router.get("/", getProducts);
-// router.get("/:id", getProduct);
-// router.delete("/:id", deleteProduct);
 
 module.exports = router;
