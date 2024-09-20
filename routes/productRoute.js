@@ -37,12 +37,7 @@ router.patch(
   updateProduct
 );
 router.get("/", protect, getProducts);
-router.get(
-  "/export-products",
-  protect,
-  restrict.restrictTo("admin"),
-  exportProducts.exportProducts
-);
+router.get("/export-products", protect, exportProducts.exportProducts);
 router.get("/:id", protect, getProduct);
 router.delete("/:id", protect, restrict.restrictTo("admin"), deleteProduct);
 
